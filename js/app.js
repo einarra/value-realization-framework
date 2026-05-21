@@ -1,4 +1,4 @@
-import { PHASES } from './schema.js';
+import { PHASES, createDefaultWorkspace } from './schema.js';
 import { loadWorkspace, saveWorkspace, replaceWorkspace, resetWorkspace, saveWorkspaceRemote, loadWorkspaceRemote } from './storage.js';
 import { buildExportPayload, downloadJson, parseWorkspaceJson } from './export.js';
 import { clear, el } from './dom.js';
@@ -175,8 +175,9 @@ async function init() {
         state.workspace = remote;
         setStatus('Loaded from server');
       } else {
-        // Project exists but no workspace saved yet — keep localStorage default.
-        setStatus('New project — no saved workspace yet');
+        // No snapshot on the server yet — start clean, ignoring any leftover localStorage data.
+        state.workspace = createDefaultWorkspace();
+        setStatus('New project');
       }
     } catch (err) {
       console.error('Remote load error:', err);
