@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Value Realization Workshop — Interactive Dashboard</title>
+  <style>
+    :root {
+      --white: #ffffff;
+      --dark-green: #00472e;
+      --bright-green: #41f0aa;
+      --cta-green: #008751;
+      --support-blue: #6fb5f7;
+      --bg: #f4fbf7;
+      --panel: #ffffff;
+      --panel2: #f7fffb;
+      --card: #ffffff;
+      --stroke: rgba(0,71,46,.16);
+      --text: #00472e;
+      --muted: rgba(0,71,46,.72);
+      --muted2: rgba(0,71,46,.55);
+      --accent: #41f0aa;
+      --accent2: #008751;
+      --good: #008751;
+      --warn: #41f0aa;
+      --bad: #6fb5f7;
+      --chip: rgba(65,240,170,.18);
+      --shadow: 0 16px 50px rgba(0,71,46,.16);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: radial-gradient(1100px 700px at 20% 0%, rgba(65,240,170,.22), transparent 60%),
+                  radial-gradient(900px 600px at 82% 18%, rgba(0,135,81,.12), transparent 58%),
+                  var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+
+    .app {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 360px 1fr 0px;
+      transition: grid-template-columns .25s ease;
+    }
+
+    .app.drawer-open {
+      grid-template-columns: 360px 1fr 520px;
+    }
+
+    /* Left panel */
+    .sidebar {
+      height: 100%;
+      color: var(--white);
+      padding: 18px 16px;
+      border-right: 1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--dark-green), #00331f);
+      backdrop-filter: blur(10px);
+      overflow: auto;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 10px 14px;
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.10);
+      box-shadow: var(--shadow);
+    }
+
+    .brand h1 {
+      font-size: 18px;
+      margin: 0;
+      letter-spacing: .2px;
+      line-height: 1.1;
+    }
+
+    .brand .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(65,240,170,.18);
+      border: 1px solid rgba(65,240,170,.40);
+      color: var(--white);
+      font-size: 12px;
+    }
+
+    .section {
+      margin-top: 14px;
+      padding: 12px;
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.08);
+    }
+
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.78);
+    }
+
+    .control {
+      margin: 10px 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .control label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .control input[type="text"],
+    .control select {
+      width: 100%;
+      padding: 10px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--stroke);
+      background: var(--white);
+      color: var(--dark-green);
+      outline: none;
+    }
+
+    .control input[type="range"] { width: 100%; }
+
+    .row { display: flex; gap: 10px; }
+    .row .control { flex: 1; }
+
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--chip);
+      border: 1px solid var(--stroke);
+      font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .chip.active {
+      background: rgba(65,240,170,.22);
+      border-color: rgba(65,240,170,.55);
+    }
+
+    .toggles { display: grid; gap: 8px; }
+    .toggle {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.72);
+    }
+
+    .toggle input { transform: scale(1.1); }
+
+    .actions {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--stroke);
+      background: var(--white);
+      color: var(--dark-green);
+      cursor: pointer;
+      transition: transform .05s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .btn:hover {
+      border-color: rgba(65,240,170,.75);
+      background: rgba(65,240,170,.18);
+    }
+
+    .btn:active { transform: translateY(1px); }
+
+    .btn.primary {
+      background: var(--cta-green); color: var(--white);
+      border-color: var(--bright-green);
+    }
+
+    /* Main */
+    .main {
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+
+    .topbar {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--stroke);
+      background: rgba(255,255,255,.86);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .kpis { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .kpi {
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke);
+      background: var(--white);
+      min-width: 160px;
+    }
+
+    .kpi .label { font-size: 12px; color: var(--muted); }
+    .kpi .value { font-size: 18px; margin-top: 2px; color: var(--dark-green); }
+
+    .content {
+      overflow: auto;
+      padding: 18px 22px 26px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    @media (max-width: 1200px) {
+      .cards { grid-template-columns: repeat(2, minmax(260px, 1fr)); }
+    }
+    @media (max-width: 880px) {
+      body { overflow: auto; }
+      .app, .app.drawer-open { grid-template-columns: 1fr; }
+      .sidebar { position: relative; height: auto; }
+      .main { height: auto; }
+      .drawer { display: none; }
+      .cards { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      cursor: pointer;
+      border-radius: var(--radius);
+      border: 1px solid var(--stroke);
+      background: var(--white);
+      box-shadow: 0 10px 30px rgba(0,71,46,.14);
+      padding: 14px 14px 12px;
+      transition: transform .12s ease, border-color .2s ease, background .2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(65,240,170,.55);
+      background: var(--white);
+    }
+
+    .card .head { display: flex; justify-content: space-between; gap: 10px; }
+    .pill {
+      font-size: 11px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.72);
+      color: var(--dark-green);
+      white-space: nowrap;
+    }
+
+    .pill.accent {
+      border-color: var(--bright-green);
+      background: rgba(65,240,170,.20);
+    }
+
+    .pill.warn {
+      border-color: rgba(65,240,170,.55);
+      background: rgba(65,240,170,.18);
+    }
+
+    .pill.bad {
+      border-color: rgba(111,181,247,.65);
+      background: rgba(111,181,247,.18);
+    }
+
+    .title {
+      margin: 10px 0 8px;
+      font-size: 16px;
+      line-height: 1.25;
+      letter-spacing: .2px;
+    }
+
+    .meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      margin-bottom: 10px;
+      min-height: 52px;
+    }
+
+    .bars {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .barrow { display: grid; grid-template-columns: 90px 1fr 28px; gap: 10px; align-items: center; }
+    .barrow .lbl { font-size: 12px; color: var(--muted2); }
+    .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(0,71,46,.10);
+      overflow: hidden;
+      border: 1px solid rgba(0,71,46,.12);
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--bright-green), var(--cta-green));
+      width: 0%;
+    }
+    .barrow .num { font-size: 12px; color: var(--dark-green); text-align: right; }
+
+    /* Drawer */
+    .drawer {
+      height: 100%;
+      color: var(--white);
+      border-left: 1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--dark-green), #00331f);
+      backdrop-filter: blur(10px);
+      overflow: auto;
+      padding: 18px 18px 22px;
+    }
+
+    .drawer .header {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, var(--dark-green), rgba(0,71,46,.88));
+      backdrop-filter: blur(10px);
+      padding: 10px 0 12px;
+      z-index: 5;
+    }
+
+    .drawer h3 { margin: 10px 0 8px; font-size: 18px; }
+    .drawer .small { color: var(--muted); font-size: 12px; }
+
+    .drawer .close {
+      float: right;
+      border: 1px solid var(--stroke);
+      background: var(--white);
+      color: var(--dark-green);
+      padding: 8px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .tab {
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.72);
+      font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .tab.active {
+      background: rgba(65,240,170,.22);
+      border-color: rgba(65,240,170,.55);
+    }
+
+    .panel {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.08);
+    }
+
+    .panel h4 { margin: 0 0 10px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.78); }
+
+    .kv { display: grid; gap: 10px; }
+    .kv .item {
+      border-radius: 12px;
+      border: 1px solid rgba(0,71,46,.12);
+      background: rgba(255,255,255,.72);
+      padding: 10px;
+    }
+    .kv .k { font-size: 11px; color: var(--muted2); letter-spacing: .08em; text-transform: uppercase; }
+    .kv .v { margin-top: 6px; font-size: 13px; color: var(--dark-green); line-height: 1.35; white-space: pre-wrap; }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid rgba(0,71,46,.12);
+    }
+
+    .table td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(0,71,46,.10);
+      vertical-align: top;
+      font-size: 13px;
+    }
+
+    .table tr:last-child td { border-bottom: none; }
+    .table td:first-child { width: 42%; color: var(--muted); }
+
+    .hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+    .empty { padding: 20px; border-radius: var(--radius); border: 1px dashed rgba(0,71,46,.28); color: var(--muted); text-align: center; }
+
+    .sidebar .brand .subtitle,
+    .sidebar .control label,
+    .drawer .small,
+    .drawer .hint {
+      color: rgba(255,255,255,.78);
+    }
+
+    .sidebar .toggle,
+    .drawer .tab {
+      color: var(--dark-green);
+    }
+
+    .drawer .table td:first-child {
+      color: rgba(255,255,255,.72);
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  // Embedded workshop data
+  const WORKSHOP_DATA = {"workshopName": "AI Value Realization Workshop", "lastUpdated": "2026-05-19T06:21:36.344Z", "useCases": [{"id": "demo-1", "name": "Customer service knowledge assistant", "category": "Productivity", "problem": "Agents spend time searching across knowledge articles and policy documents.", "users": "Customer service agents and team leads", "currentProcess": "Manual search across multiple internal sources during customer conversations.", "aiSolution": "AI assistant summarizes relevant policies and suggests response drafts with source links.", "expectedValue": "Faster response time, improved consistency, and reduced onboarding time.", "dataSources": "Knowledge base, policy documents, historical resolved cases", "dataReadinessNotes": "Knowledge base exists but needs ownership and quality review.", "dependencies": "Knowledge governance, CRM integration, agent workflow design", "risks": "Incorrect answers could affect customer experience.", "kpis": "Average handling time, first-contact resolution, agent satisfaction", "assumptions": "Source documents can be approved for AI-assisted retrieval.", "scores": {"businessValue": 4, "feasibility": 4, "dataReadiness": 3}, "governance": {"sensitiveData": "Unknown", "consequentialImpact": "No", "humanReview": "Yes", "biasRisk": "Unknown", "approvedDataSource": "Unknown", "policyConstraints": "Unknown", "monitoringNeeds": "Monitor answer quality and escalation patterns.", "flag": "Needs review"}, "portfolioCategory": "Quick wins"}, {"id": "demo-2", "name": "Invoice exception triage", "category": "Operations", "problem": "Finance teams manually review invoice exceptions and route them for resolution.", "users": "Accounts payable specialists and finance operations leads", "currentProcess": "Manual classification of exception reasons and repeated follow-up emails.", "aiSolution": "AI classifies exceptions, suggests next action, and drafts supplier or internal follow-up.", "expectedValue": "Reduced cycle time and fewer manual touches in accounts payable.", "dataSources": "Invoice records, purchase orders, supplier master data, exception history", "dataReadinessNotes": "Core data exists in ERP; exception labels may be inconsistent.", "dependencies": "ERP access, process owner alignment, exception taxonomy", "risks": "Financial process errors require human approval.", "kpis": "Exception cycle time, manual touches, late payment rate", "assumptions": "Historical exception data is accessible for analysis.", "scores": {"businessValue": 5, "feasibility": 3, "dataReadiness": 3}, "governance": {"sensitiveData": "Yes", "consequentialImpact": "Yes", "humanReview": "Yes", "biasRisk": "No", "approvedDataSource": "Unknown", "policyConstraints": "Unknown", "monitoringNeeds": "Audit recommendations and approval overrides.", "flag": "Needs review"}, "portfolioCategory": "Experiments"}, {"id": "demo-3", "name": "Predictive churn intervention", "category": "Customer experience", "problem": "Customer churn signals are noticed too late for proactive retention.", "users": "Customer success leaders, account managers, marketing teams", "currentProcess": "Reactive reviews based on lagging reports and account manager intuition.", "aiSolution": "AI predicts churn risk and recommends next-best retention actions.", "expectedValue": "Improved retention and more focused customer success effort.", "dataSources": "Usage data, CRM history, support tickets, billing events, NPS results", "dataReadinessNotes": "Data is spread across systems and requires integration.", "dependencies": "Data platform work, customer success process changes, model monitoring", "risks": "Poor recommendations may harm customer relationships.", "kpis": "Churn rate, retention revenue, intervention success rate", "assumptions": "Sufficient historical churn patterns exist.", "scores": {"businessValue": 5, "feasibility": 2, "dataReadiness": 2}, "governance": {"sensitiveData": "Yes", "consequentialImpact": "Yes", "humanReview": "Yes", "biasRisk": "Yes", "approvedDataSource": "Unknown", "policyConstraints": "Unknown", "monitoringNeeds": "Monitor model drift, fairness, and intervention outcomes.", "flag": "High concern / hold"}, "portfolioCategory": "Strategic bets"}]};
+</script>
+
+<div id="app" class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <h1 id="workshopTitle"></h1>
+      <div class="subtitle">
+        <span class="badge" id="updatedBadge"></span>
+        <span class="badge" id="countBadge"></span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Search & Sort</h2>
+      <div class="control">
+        <label for="q">Search</label>
+        <input id="q" type="text" placeholder="Search use cases (name, problem, users, value...)" />
+      </div>
+      <div class="control">
+        <label for="sort">Sort by</label>
+        <select id="sort">
+          <option value="total_desc">Total score (desc)</option>
+          <option value="bv_desc">Business value (desc)</option>
+          <option value="feas_desc">Feasibility (desc)</option>
+          <option value="dr_desc">Data readiness (desc)</option>
+          <option value="name_asc">Name (A → Z)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Filters</h2>
+
+      <div class="control">
+        <label>Category</label>
+        <div id="categoryChips" class="chips"></div>
+      </div>
+
+      <div class="control">
+        <label for="portfolio">Portfolio</label>
+        <select id="portfolio">
+          <option value="">All</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="control">
+          <label for="minBV">Min business value: <span id="minBVVal">1</span></label>
+          <input id="minBV" type="range" min="1" max="5" step="1" value="1" />
+        </div>
+        <div class="control">
+          <label for="minFeas">Min feasibility: <span id="minFeasVal">1</span></label>
+          <input id="minFeas" type="range" min="1" max="5" step="1" value="1" />
+        </div>
+      </div>
+
+      <div class="control">
+        <label for="minDR">Min data readiness: <span id="minDRVal">1</span></label>
+        <input id="minDR" type="range" min="1" max="5" step="1" value="1" />
+      </div>
+
+      <div class="control">
+        <label>Governance flags</label>
+        <div class="toggles">
+          <label class="toggle"><input id="flagNeedsReview" type="checkbox" /> Needs review</label>
+          <label class="toggle"><input id="flagHighConcern" type="checkbox" /> High concern / hold</label>
+          <label class="toggle"><input id="flagSensitive" type="checkbox" /> Sensitive data = Yes</label>
+          <label class="toggle"><input id="flagConsequential" type="checkbox" /> Consequential impact = Yes</label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="export">Export (CSV)</button>
+      </div>
+      <div class="hint">Tip: Click a card to open drill-down. Copy link to share deep-links to a specific use case.</div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div class="kpis">
+        <div class="kpi">
+          <div class="label">Showing</div>
+          <div class="value" id="kpiShowing">–</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Avg. total score</div>
+          <div class="value" id="kpiAvg">–</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Portfolio mix</div>
+          <div class="value" id="kpiMix">–</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="btn" id="closeDrawerBtn" style="display:none;">Close details</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div id="cards" class="cards"></div>
+      <div id="empty" class="empty" style="display:none;">No use cases match the current filters.</div>
+    </div>
+  </main>
+
+  <!-- Drawer -->
+  <aside id="drawer" class="drawer" aria-hidden="true">
+    <div class="header">
+      <button class="close" id="drawerClose">✕</button>
+      <div class="small" id="drawerMeta"></div>
+      <h3 id="drawerTitle">Use case</h3>
+      <div class="tabs" id="tabs"></div>
+    </div>
+    <div id="drawerBody"></div>
+  </aside>
+</div>
+
+<script>
+(function(){
+  const app = document.getElementById('app');
+  const cardsEl = document.getElementById('cards');
+  const emptyEl = document.getElementById('empty');
+  const drawer = document.getElementById('drawer');
+
+  const state = {
+    q: '',
+    sort: 'total_desc',
+    categories: new Set(),
+    portfolio: '',
+    minBV: 1,
+    minFeas: 1,
+    minDR: 1,
+    flagNeedsReview: false,
+    flagHighConcern: false,
+    flagSensitive: false,
+    flagConsequential: false,
+    selectedId: null,
+    tab: 'Overview',
+  };
+
+  const useCases = (WORKSHOP_DATA.useCases || []).map(u => {
+    const s = u.scores || {};
+    const bv = Number(s.businessValue ?? 0);
+    const feas = Number(s.feasibility ?? 0);
+    const dr = Number(s.dataReadiness ?? 0);
+    const total = bv + feas + dr;
+    return Object.assign({}, u, { _bv: bv, _feas: feas, _dr: dr, _total: total });
+  });
+
+  // Header
+  document.getElementById('workshopTitle').textContent = WORKSHOP_DATA.workshopName || 'AI Value Realization Workshop';
+  const updated = WORKSHOP_DATA.lastUpdated ? new Date(WORKSHOP_DATA.lastUpdated) : null;
+  document.getElementById('updatedBadge').textContent = updated ? `Last updated: ${updated.toLocaleString()}` : 'Last updated: –';
+  document.getElementById('countBadge').textContent = `${useCases.length} use cases`;
+
+  // Build category chips
+  const categories = Array.from(new Set(useCases.map(u => u.category).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+  const categoryChips = document.getElementById('categoryChips');
+  categories.forEach(cat => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = cat;
+    chip.addEventListener('click', () => {
+      if(state.categories.has(cat)) state.categories.delete(cat); else state.categories.add(cat);
+      render();
+    });
+    categoryChips.appendChild(chip);
+  });
+
+  // Portfolio options
+  const portfolios = Array.from(new Set(useCases.map(u => u.portfolioCategory).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+  const portfolioSel = document.getElementById('portfolio');
+  portfolios.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p;
+    opt.textContent = p;
+    portfolioSel.appendChild(opt);
+  });
+
+  // Controls
+  const qEl = document.getElementById('q');
+  const sortEl = document.getElementById('sort');
+  const minBVEl = document.getElementById('minBV');
+  const minFeasEl = document.getElementById('minFeas');
+  const minDREl = document.getElementById('minDR');
+
+  qEl.addEventListener('input', () => { state.q = qEl.value.trim(); render(); });
+  sortEl.addEventListener('change', () => { state.sort = sortEl.value; render(); });
+  portfolioSel.addEventListener('change', () => { state.portfolio = portfolioSel.value; render(); });
+
+  function bindRange(el, key, labelId){
+    const lab = document.getElementById(labelId);
+    const update = () => { state[key] = Number(el.value); lab.textContent = el.value; render(); };
+    el.addEventListener('input', update);
+    update();
+  }
+  bindRange(minBVEl, 'minBV', 'minBVVal');
+  bindRange(minFeasEl, 'minFeas', 'minFeasVal');
+  bindRange(minDREl, 'minDR', 'minDRVal');
+
+  function bindToggle(id, key){
+    const el = document.getElementById(id);
+    el.addEventListener('change', () => { state[key] = el.checked; render(); });
+  }
+  bindToggle('flagNeedsReview', 'flagNeedsReview');
+  bindToggle('flagHighConcern', 'flagHighConcern');
+  bindToggle('flagSensitive', 'flagSensitive');
+  bindToggle('flagConsequential', 'flagConsequential');
+
+  document.getElementById('reset').addEventListener('click', () => {
+    state.q = '';
+    state.sort = 'total_desc';
+    state.categories.clear();
+    state.portfolio = '';
+    state.minBV = 1; state.minFeas = 1; state.minDR = 1;
+    state.flagNeedsReview = false;
+    state.flagHighConcern = false;
+    state.flagSensitive = false;
+    state.flagConsequential = false;
+    qEl.value = '';
+    sortEl.value = 'total_desc';
+    portfolioSel.value = '';
+    minBVEl.value = 1; minFeasEl.value = 1; minDREl.value = 1;
+    document.getElementById('flagNeedsReview').checked = false;
+    document.getElementById('flagHighConcern').checked = false;
+    document.getElementById('flagSensitive').checked = false;
+    document.getElementById('flagConsequential').checked = false;
+    closeDrawer();
+    render();
+  });
+
+  document.getElementById('export').addEventListener('click', () => {
+    const rows = currentFiltered();
+    const headers = [
+      'id','name','category','portfolioCategory','businessValue','feasibility','dataReadiness','totalScore',
+      'problem','users','currentProcess','aiSolution','expectedValue','dataSources','dataReadinessNotes','dependencies','risks','kpis','assumptions',
+      'gov_sensitiveData','gov_consequentialImpact','gov_humanReview','gov_biasRisk','gov_flag','gov_monitoringNeeds'
+    ];
+    const esc = (v) => {
+      if(v === null || v === undefined) return '';
+      const s = String(v).replaceAll('"','""');
+      return /[\n\r,\"]/g.test(s) ? `"${s}"` : s;
+    };
+    const lines = [headers.join(',')].concat(rows.map(u => {
+      const g = u.governance || {};
+      const s = u.scores || {};
+      const obj = {
+        id: u.id,
+        name: u.name,
+        category: u.category,
+        portfolioCategory: u.portfolioCategory,
+        businessValue: s.businessValue,
+        feasibility: s.feasibility,
+        dataReadiness: s.dataReadiness,
+        totalScore: u._total,
+        problem: u.problem,
+        users: u.users,
+        currentProcess: u.currentProcess,
+        aiSolution: u.aiSolution,
+        expectedValue: u.expectedValue,
+        dataSources: u.dataSources,
+        dataReadinessNotes: u.dataReadinessNotes,
+        dependencies: u.dependencies,
+        risks: u.risks,
+        kpis: u.kpis,
+        assumptions: u.assumptions,
+        gov_sensitiveData: g.sensitiveData,
+        gov_consequentialImpact: g.consequentialImpact,
+        gov_humanReview: g.humanReview,
+        gov_biasRisk: g.biasRisk,
+        gov_flag: g.flag,
+        gov_monitoringNeeds: g.monitoringNeeds,
+      };
+      return headers.map(h => esc(obj[h])).join(',');
+    }));
+
+    const blob = new Blob([lines.join('\n')], {type: 'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    const safeName = (WORKSHOP_DATA.workshopName || 'ai-value-realization').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    a.download = `${safeName}-export.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+  });
+
+  // Card rendering
+  function governancePill(u){
+    const flag = ((u.governance||{}).flag || '');
+    const f = flag.toLowerCase();
+    if(f.includes('high concern') || f.includes('hold')) return ['High concern', 'bad'];
+    if(f.includes('needs review')) return ['Needs review', 'warn'];
+    return ['OK', 'accent'];
+  }
+
+  function pillForPortfolio(p){
+    const low = String(p||'').toLowerCase();
+    if(low.includes('quick')) return ['Quick wins', 'accent'];
+    if(low.includes('experiment')) return ['Experiments', 'warn'];
+    if(low.includes('strategic')) return ['Strategic bets', 'bad'];
+    return [p||'Portfolio', 'pill'];
+  }
+
+  function escapeHTML(s){
+    return String(s ?? '').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function cardHTML(u){
+    const g = governancePill(u);
+    const p = pillForPortfolio(u.portfolioCategory);
+    const minDesc = String(u.problem || '').trim();
+    const desc = minDesc.length > 130 ? (minDesc.slice(0,127) + '…') : minDesc;
+    const s = u.scores || {};
+    const barPct = v => Math.max(0, Math.min(100, (Number(v||0)/5)*100));
+
+    return `
+      <div class="card" data-id="${u.id}">
+        <div class="head">
+          <span class="pill ${p[1]}">${escapeHTML(p[0])}</span>
+          <span class="pill ${g[1]}">${escapeHTML(g[0])}</span>
+        </div>
+        <div class="title">${escapeHTML(u.name || 'Use case')}</div>
+        <div class="meta">
+          <span class="pill">${escapeHTML(u.category || 'Category')}</span>
+          <span class="pill">Total: ${u._total}/15</span>
+        </div>
+        <div class="desc">${escapeHTML(desc || '—')}</div>
+        <div class="bars">
+          <div class="barrow"><div class="lbl">Business</div><div class="bar"><span style="width:${barPct(s.businessValue)}%"></span></div><div class="num">${s.businessValue ?? '—'}</div></div>
+          <div class="barrow"><div class="lbl">Feasible</div><div class="bar"><span style="width:${barPct(s.feasibility)}%"></span></div><div class="num">${s.feasibility ?? '—'}</div></div>
+          <div class="barrow"><div class="lbl">Data</div><div class="bar"><span style="width:${barPct(s.dataReadiness)}%"></span></div><div class="num">${s.dataReadiness ?? '—'}</div></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function textBlob(u){
+    const g = u.governance || {};
+    const fields = [u.id, u.name, u.category, u.problem, u.users, u.currentProcess, u.aiSolution, u.expectedValue,
+      u.dataSources, u.dataReadinessNotes, u.dependencies, u.risks, u.kpis, u.assumptions,
+      g.sensitiveData, g.consequentialImpact, g.humanReview, g.biasRisk, g.flag, g.monitoringNeeds
+    ];
+    return fields.filter(Boolean).join(' ').toLowerCase();
+  }
+
+  function currentFiltered(){
+    const q = state.q.toLowerCase();
+    return useCases.filter(u => {
+      const s = u.scores || {};
+      if(state.categories.size && !state.categories.has(u.category)) return false;
+      if(state.portfolio && u.portfolioCategory !== state.portfolio) return false;
+      if(Number(s.businessValue||0) < state.minBV) return false;
+      if(Number(s.feasibility||0) < state.minFeas) return false;
+      if(Number(s.dataReadiness||0) < state.minDR) return false;
+
+      const g = u.governance || {};
+      const flag = String(g.flag||'');
+      if(state.flagNeedsReview && !flag.toLowerCase().includes('needs review')) return false;
+      if(state.flagHighConcern && !(flag.toLowerCase().includes('high concern') || flag.toLowerCase().includes('hold'))) return false;
+      if(state.flagSensitive && String(g.sensitiveData||'').toLowerCase() !== 'yes') return false;
+      if(state.flagConsequential && String(g.consequentialImpact||'').toLowerCase() !== 'yes') return false;
+
+      if(q){
+        return textBlob(u).includes(q);
+      }
+      return true;
+    });
+  }
+
+  function sortRows(rows){
+    const r = [...rows];
+    const by = state.sort;
+    const collator = new Intl.Collator(undefined, {numeric:true, sensitivity:'base'});
+
+    r.sort((a,b) => {
+      if(by === 'name_asc') return collator.compare(a.name||'', b.name||'');
+      if(by === 'bv_desc') return (b._bv - a._bv) || (b._total - a._total);
+      if(by === 'feas_desc') return (b._feas - a._feas) || (b._total - a._total);
+      if(by === 'dr_desc') return (b._dr - a._dr) || (b._total - a._total);
+      return (b._total - a._total) || (b._bv - a._bv);
+    });
+    return r;
+  }
+
+  function updateSidebarChips(){
+    [...categoryChips.children].forEach(ch => {
+      const active = state.categories.has(ch.textContent);
+      ch.classList.toggle('active', active);
+    });
+  }
+
+  function updateKPIs(rows){
+    document.getElementById('kpiShowing').textContent = `${rows.length} / ${useCases.length}`;
+    const avg = rows.length ? (rows.reduce((s,u)=>s+u._total,0)/rows.length) : 0;
+    document.getElementById('kpiAvg').textContent = rows.length ? `${avg.toFixed(1)} / 15` : '–';
+
+    const mix = {};
+    rows.forEach(u => { const k = u.portfolioCategory || 'Uncategorized'; mix[k] = (mix[k]||0)+1; });
+    const parts = Object.entries(mix).sort((a,b)=>b[1]-a[1]).map(([k,v]) => `${k}: ${v}`);
+    document.getElementById('kpiMix').textContent = parts.length ? parts.slice(0,2).join(' · ') + (parts.length>2 ? ' · …' : '') : '–';
+  }
+
+  // Drawer
+  const tabsEl = document.getElementById('tabs');
+  const drawerBody = document.getElementById('drawerBody');
+  const drawerTitle = document.getElementById('drawerTitle');
+  const drawerMeta = document.getElementById('drawerMeta');
+  const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+
+  const TABSET = ['Overview','Data & Process','Governance','KPIs & Outcomes'];
+
+  function closeDrawer(){
+    app.classList.remove('drawer-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    closeDrawerBtn.style.display = 'none';
+    state.selectedId = null;
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+
+  function kv(items){
+    return `
+      <div class="kv">
+        ${items.map(([k,v]) => `
+          <div class="item">
+            <div class="k">${escapeHTML(k)}</div>
+            <div class="v">${escapeHTML(v || '—')}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function renderDrawer(u){
+    [...tabsEl.children].forEach(t => t.classList.toggle('active', t.textContent === state.tab));
+    const g = u.governance || {};
+    const s = u.scores || {};
+
+    const shareLink = `#${encodeURIComponent(u.id)}`;
+    const shareBtn = `
+      <div style="display:flex; gap:10px; align-items:center; margin-top:10px;">
+        <button class="btn primary" id="copyLink">Copy link</button>
+        <button class="btn" id="copySummary">Copy 1-page summary</button>
+      </div>
+      <div class="hint">Deep-link: <span style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono','Courier New', monospace;">${escapeHTML(shareLink)}</span></div>
+    `;
+
+    if(state.tab === 'Overview'){
+      drawerBody.innerHTML = `
+        <div class="panel">
+          <h4>What & Why</h4>
+          ${kv([
+            ['Problem', u.problem],
+            ['Users', u.users],
+            ['Current process', u.currentProcess],
+            ['AI solution', u.aiSolution],
+            ['Expected value', u.expectedValue],
+          ])}
+          ${shareBtn}
+        </div>
+
+        <div class="panel">
+          <h4>Scorecard</h4>
+          <table class="table">
+            <tr><td>Business value</td><td>${escapeHTML(s.businessValue ?? '—')} / 5</td></tr>
+            <tr><td>Feasibility</td><td>${escapeHTML(s.feasibility ?? '—')} / 5</td></tr>
+            <tr><td>Data readiness</td><td>${escapeHTML(s.dataReadiness ?? '—')} / 5</td></tr>
+            <tr><td><strong>Total</strong></td><td><strong>${u._total} / 15</strong></td></tr>
+          </table>
+        </div>
+      `;
+    }
+
+    if(state.tab === 'Data & Process'){
+      drawerBody.innerHTML = `
+        <div class="panel">
+          <h4>Data</h4>
+          ${kv([
+            ['Data sources', u.dataSources],
+            ['Data readiness notes', u.dataReadinessNotes],
+          ])}
+        </div>
+        <div class="panel">
+          <h4>Delivery dependencies & risks</h4>
+          ${kv([
+            ['Dependencies', u.dependencies],
+            ['Risks', u.risks],
+            ['Assumptions', u.assumptions],
+          ])}
+        </div>
+        ${shareBtn}
+      `;
+    }
+
+    if(state.tab === 'Governance'){
+      const fmt = (v) => (v === null || v === undefined || v === '') ? '—' : String(v);
+      const flag = fmt(g.flag);
+      drawerBody.innerHTML = `
+        <div class="panel">
+          <h4>Governance checkpoint</h4>
+          <table class="table">
+            <tr><td>Sensitive data</td><td>${escapeHTML(fmt(g.sensitiveData))}</td></tr>
+            <tr><td>Consequential impact</td><td>${escapeHTML(fmt(g.consequentialImpact))}</td></tr>
+            <tr><td>Human review</td><td>${escapeHTML(fmt(g.humanReview))}</td></tr>
+            <tr><td>Bias risk</td><td>${escapeHTML(fmt(g.biasRisk))}</td></tr>
+            <tr><td>Approved data source</td><td>${escapeHTML(fmt(g.approvedDataSource))}</td></tr>
+            <tr><td>Policy constraints</td><td>${escapeHTML(fmt(g.policyConstraints))}</td></tr>
+            <tr><td>Monitoring needs</td><td>${escapeHTML(fmt(g.monitoringNeeds))}</td></tr>
+            <tr><td><strong>Flag</strong></td><td><strong>${escapeHTML(flag)}</strong></td></tr>
+          </table>
+        </div>
+        ${shareBtn}
+      `;
+    }
+
+    if(state.tab === 'KPIs & Outcomes'){
+      drawerBody.innerHTML = `
+        <div class="panel">
+          <h4>KPIs</h4>
+          ${kv([
+            ['KPIs', u.kpis],
+            ['Expected value', u.expectedValue],
+          ])}
+        </div>
+        ${shareBtn}
+      `;
+    }
+
+    // Copy buttons
+    const copyLinkBtn = document.getElementById('copyLink');
+    const copySummaryBtn = document.getElementById('copySummary');
+    if(copyLinkBtn){
+      copyLinkBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(location.href);
+          copyLinkBtn.textContent = 'Copied!';
+          setTimeout(() => copyLinkBtn.textContent = 'Copy link', 900);
+        } catch(e){
+          alert('Clipboard not available in this context.');
+        }
+      });
+    }
+    if(copySummaryBtn){
+      copySummaryBtn.addEventListener('click', async () => {
+        const s = u.scores || {};
+        const g = u.governance || {};
+        const summary = `USE CASE: ${u.name}\nCATEGORY: ${u.category}\nPORTFOLIO: ${u.portfolioCategory}\n\nPROBLEM:\n${u.problem}\n\nUSERS:\n${u.users}\n\nCURRENT PROCESS:\n${u.currentProcess}\n\nAI SOLUTION:\n${u.aiSolution}\n\nEXPECTED VALUE:\n${u.expectedValue}\n\nDATA SOURCES:\n${u.dataSources}\n\nDEPENDENCIES:\n${u.dependencies}\n\nRISKS:\n${u.risks}\n\nKPIs:\n${u.kpis}\n\nSCORECARD: BV ${s.businessValue}/5 | Feas ${s.feasibility}/5 | Data ${s.dataReadiness}/5 | Total ${u._total}/15\nGOVERNANCE FLAG: ${g.flag || '—'}`;
+        try {
+          await navigator.clipboard.writeText(summary);
+          copySummaryBtn.textContent = 'Copied!';
+          setTimeout(() => copySummaryBtn.textContent = 'Copy 1-page summary', 900);
+        } catch(e){
+          alert('Clipboard not available in this context.');
+        }
+      });
+    }
+  }
+
+  function openDrawer(u){
+    state.selectedId = u.id;
+    app.classList.add('drawer-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    closeDrawerBtn.style.display = 'inline-flex';
+
+    drawerTitle.textContent = u.name || 'Use case';
+    const g = u.governance || {};
+    drawerMeta.textContent = `${u.category || 'Category'} · ${u.portfolioCategory || 'Portfolio'} · Total ${u._total}/15 · Gov: ${(g.flag||'—')}`;
+
+    tabsEl.innerHTML = '';
+    TABSET.forEach(t => {
+      const tab = document.createElement('div');
+      tab.className = 'tab' + (state.tab === t ? ' active' : '');
+      tab.textContent = t;
+      tab.addEventListener('click', () => { state.tab = t; renderDrawer(u); });
+      tabsEl.appendChild(tab);
+    });
+
+    renderDrawer(u);
+    history.replaceState(null, '', `#${encodeURIComponent(u.id)}`);
+  }
+
+  document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+  closeDrawerBtn.addEventListener('click', closeDrawer);
+
+  // Main render
+  function render(){
+    updateSidebarChips();
+
+    const rows = sortRows(currentFiltered());
+    updateKPIs(rows);
+
+    if(!rows.length){
+      cardsEl.innerHTML = '';
+      emptyEl.style.display = 'block';
+    } else {
+      emptyEl.style.display = 'none';
+      cardsEl.innerHTML = rows.map(cardHTML).join('');
+      [...cardsEl.querySelectorAll('.card')].forEach(el => {
+        el.addEventListener('click', () => {
+          const id = el.getAttribute('data-id');
+          const u = useCases.find(x => x.id === id);
+          if(u) openDrawer(u);
+        });
+      });
+    }
+
+    if(state.selectedId){
+      const u = useCases.find(x => x.id === state.selectedId);
+      if(u) renderDrawer(u);
+    }
+  }
+
+  function openFromHash(){
+    const id = decodeURIComponent((location.hash || '').replace('#',''));
+    if(!id) return;
+    const u = useCases.find(x => x.id === id);
+    if(u) openDrawer(u);
+  }
+
+  window.addEventListener('hashchange', openFromHash);
+
+  render();
+  openFromHash();
+})();
+</script>
+</body>
+</html>

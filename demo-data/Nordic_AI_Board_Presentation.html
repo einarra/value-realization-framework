@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nordic Supply Direct — AI Value Realization</title>
+<style>
+body {font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto; margin:0; background:#0f172a; color:#e2e8f0;}
+.header {padding:40px; background: linear-gradient(135deg,#0ea5e9,#1e293b);} 
+h1{margin:0;font-size:32px;} h2{color:#38bdf8;margin-top:30px;} p{color:#cbd5f5;}
+.container{padding:30px;} .tabs{display:flex;gap:10px;margin-bottom:20px;}
+button{padding:10px 15px;border:none;cursor:pointer;background:#1e293b;color:white;border-radius:6px;}
+button.active{background:#0ea5e9;}
+.card{background:#1e293b;padding:15px;margin:10px 0;border-radius:8px;}
+.highlight{background:#0ea5e9;color:#0f172a;padding:5px 10px;border-radius:5px;font-weight:bold;}
+.kpi{display:inline-block;margin:10px;padding:15px;background:#020617;border:1px solid #38bdf8;border-radius:8px;}
+</style>
+</head>
+<body>
+<div class="header"><h1>Nordic Supply Direct</h1><p>AI Value Realization — Executive Brief</p></div>
+<div class="container">
+<div class="tabs">
+<button onclick="showTab('overview')" class="active">Overview</button>
+<button onclick="showTab('diagnosis')">Diagnosis</button>
+<button onclick="showTab('usecases')">Use Cases</button>
+<button onclick="showTab('prioritization')">Prioritization</button>
+<button onclick="showTab('roadmap')">Roadmap</button>
+</div>
+<div id="overview" class="tab">
+<h2>Executive Summary</h2>
+<p>Nordic Supply Direct has strong operational scale and rich data, but inefficiencies in forecasting, exception handling, and customer service create cost leakage and service risk.</p>
+<h2>Key Opportunity</h2>
+<p>Apply AI across planning, logistics, and customer interaction to unlock productivity, improve delivery reliability, and reduce inventory inefficiencies.</p>
+<div class="kpi">↑ Service Level</div>
+<div class="kpi">↓ Inventory Costs</div>
+<div class="kpi">↓ Manual Work</div>
+<div class="kpi">↑ Customer Satisfaction</div>
+</div>
+<div id="diagnosis" class="tab" style="display:none;">
+<h2>Key Challenges</h2>
+<div class="card"><b>Forecasting inefficiency</b><br>Demand forecasts are manually adjusted across planners and regions</div>
+<div class="card"><b>Fragmented data</b><br>ERP, WMS, TMS and carrier systems are not unified</div>
+<div class="card"><b>Operational inefficiency</b><br>Manual triage of delivery exceptions and customer requests</div>
+<div class="card"><b>Customer experience impact</b><br>Service teams spend significant time retrieving order status</div>
+</div>
+<div id="usecases" class="tab" style="display:none;">
+<h2>Prioritized AI Use Cases</h2>
+<div class="card"><span class="highlight">Now</span>
+<h3>Customer Service AI Assistant</h3>
+<p>Unified order, shipment, and delivery insights across systems</p>
+<p><b>Impact:</b> Reduced handling time, improved first-contact resolution</p></div>
+<div class="card"><span class="highlight">Now</span>
+<h3>Delivery Exception AI Assistant</h3>
+<p>Classifies disruptions and recommends actions</p>
+<p><b>Impact:</b> Faster resolution, improved SLA performance</p></div>
+<div class="card"><span class="highlight">Next</span>
+<h3>AI Demand Forecasting</h3>
+<p>Automated, explainable forecasts with exception alerts</p>
+<p><b>Impact:</b> Reduced stockouts and inventory buffers</p></div>
+</div>
+<div id="prioritization" class="tab" style="display:none;">
+<h2>Value vs Feasibility</h2>
+<div class="card"><h3>Customer Service Assistant</h3><p>Business Value: High | Feasibility: High</p></div>
+<div class="card"><h3>Delivery Exception Assistant</h3><p>Business Value: Medium-High | Feasibility: High</p></div>
+<div class="card"><h3>Demand Forecasting</h3><p>Business Value: High | Feasibility: Medium</p></div>
+</div>
+<div id="roadmap" class="tab" style="display:none;">
+<h2>AI Transformation Roadmap</h2>
+<div class="card"><span class="highlight">NOW</span><p>Customer Service AI Assistant</p><p>Delivery Exception Assistant</p></div>
+<div class="card"><span class="highlight">NEXT</span><p>AI Demand Forecasting</p></div>
+<h2>Execution Focus</h2>
+<ul>
+<li>Integrate ERP, WMS, TMS data</li>
+<li>Establish governance and approval workflows</li>
+<li>Deploy AI copilots for frontline roles</li>
+</ul>
+</div>
+</div>
+<script>
+function showTab(tabId){document.querySelectorAll('.tab').forEach(tab=>{tab.style.display='none';});document.getElementById(tabId).style.display='block';document.querySelectorAll('button').forEach(btn=>{btn.classList.remove('active');});event.target.classList.add('active');}
+</script>
+</body>
+</html>

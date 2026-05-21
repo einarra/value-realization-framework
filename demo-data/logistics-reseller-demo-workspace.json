@@ -1,0 +1,125 @@
+{
+  "exportType": "workspace",
+  "exportedAt": "2026-05-19T12:00:00.000Z",
+  "data": {
+    "version": 1,
+    "workspace": {
+      "name": "Nordic Supply Direct — AI Value Realization Demo",
+      "createdAt": "2026-05-19T08:30:00.000Z",
+      "updatedAt": "2026-05-19T16:45:00.000Z"
+    },
+    "phase1": {
+      "cards": [
+        { "id": "card_001", "lane": "Weaknesses", "text": "Demand forecasts are frequently adjusted manually by planners and regional warehouse managers.", "priority": "Pri 1", "createdAt": "2026-05-19T09:05:00.000Z", "updatedAt": "2026-05-19T09:20:00.000Z" },
+        { "id": "card_002", "lane": "Weaknesses", "text": "Inventory buffers are inconsistent across central warehouse, regional hubs, and high-volume product categories.", "priority": "Pri 2", "createdAt": "2026-05-19T09:06:00.000Z", "updatedAt": "2026-05-19T09:21:00.000Z" },
+        { "id": "card_003", "lane": "Strengths", "text": "Nationwide distribution network with two central warehouses, eight regional hubs, and strong carrier partnerships.", "priority": "", "createdAt": "2026-05-19T09:07:00.000Z", "updatedAt": "2026-05-19T09:07:00.000Z" },
+        { "id": "card_004", "lane": "Strengths", "text": "High order volume creates rich historical demand, delivery, and customer service data.", "priority": "", "createdAt": "2026-05-19T09:08:00.000Z", "updatedAt": "2026-05-19T09:08:00.000Z" },
+        { "id": "card_005", "lane": "Issues in workprocesses", "text": "Transport exceptions are triaged manually from emails, carrier portals, and phone calls.", "priority": "Pri 1", "createdAt": "2026-05-19T09:10:00.000Z", "updatedAt": "2026-05-19T09:25:00.000Z" },
+        { "id": "card_006", "lane": "Issues in workprocesses", "text": "Customer service spends significant time checking order status across ERP, WMS, TMS, and carrier sites.", "priority": "Pri 1", "createdAt": "2026-05-19T09:11:00.000Z", "updatedAt": "2026-05-19T09:26:00.000Z" },
+        { "id": "card_007", "lane": "Issues in workprocesses", "text": "Sales teams apply ad-hoc discounts to protect large accounts, causing margin leakage.", "priority": "Pri 2", "createdAt": "2026-05-19T09:12:00.000Z", "updatedAt": "2026-05-19T09:28:00.000Z" },
+        { "id": "card_008", "lane": "Issues in tools or data", "text": "Product master data has inconsistent dimensions, substitutions, and packaging information.", "priority": "Pri 2", "createdAt": "2026-05-19T09:15:00.000Z", "updatedAt": "2026-05-19T09:31:00.000Z" },
+        { "id": "card_009", "lane": "Issues in tools or data", "text": "Customer, order, inventory, and carrier data is fragmented across ERP, e-commerce, WMS, and TMS platforms.", "priority": "Pri 1", "createdAt": "2026-05-19T09:16:00.000Z", "updatedAt": "2026-05-19T09:32:00.000Z" },
+        { "id": "card_010", "lane": "Risks", "text": "AI recommendations could trigger wrong replenishment or delivery actions if not reviewed by planners.", "priority": "Pri 2", "createdAt": "2026-05-19T09:18:00.000Z", "updatedAt": "2026-05-19T09:35:00.000Z" },
+        { "id": "card_011", "lane": "Risks", "text": "Customer-specific contract pricing and delivery terms require strong access control and auditability.", "priority": "Pri 2", "createdAt": "2026-05-19T09:19:00.000Z", "updatedAt": "2026-05-19T09:36:00.000Z" },
+        { "id": "card_012", "lane": "Strategic options (possibilities)", "text": "Use AI to create a control-tower view for demand, inventory, transport exceptions, and service risk.", "priority": "Pri 1", "createdAt": "2026-05-19T09:22:00.000Z", "updatedAt": "2026-05-19T09:40:00.000Z" },
+        { "id": "card_013", "lane": "Strategic options (possibilities)", "text": "Offer premium delivery reliability insights to key B2B customers through the customer portal.", "priority": "Pri 3", "createdAt": "2026-05-19T09:24:00.000Z", "updatedAt": "2026-05-19T09:24:00.000Z" }
+      ]
+    },
+    "phase2": {
+      "opportunities": [
+        { "id": "opp_001", "text": "AI demand forecasting for high-volume SKUs and regional hubs", "category": "decided", "linkedIssueIds": ["card_001"], "createdAt": "2026-05-19T11:05:00.000Z", "updatedAt": "2026-05-19T11:40:00.000Z" },
+        { "id": "opp_002", "text": "Inventory balancing recommendations between central warehouse and regional hubs", "category": "recommended", "linkedIssueIds": ["card_002"], "createdAt": "2026-05-19T11:10:00.000Z", "updatedAt": "2026-05-19T11:35:00.000Z" },
+        { "id": "opp_003", "text": "Delivery exception triage assistant for late, damaged, or blocked shipments", "category": "decided", "linkedIssueIds": ["card_005"], "createdAt": "2026-05-19T11:15:00.000Z", "updatedAt": "2026-05-19T11:42:00.000Z" },
+        { "id": "opp_004", "text": "Customer service order-status assistant with source links across ERP, WMS, TMS, and carrier portals", "category": "decided", "linkedIssueIds": ["card_006"], "createdAt": "2026-05-19T11:20:00.000Z", "updatedAt": "2026-05-19T11:45:00.000Z" },
+        { "id": "opp_005", "text": "AI margin guidance for sales quotes and discount approvals", "category": "recommended", "linkedIssueIds": ["card_007"], "createdAt": "2026-05-19T11:25:00.000Z", "updatedAt": "2026-05-19T11:50:00.000Z" },
+        { "id": "opp_006", "text": "Data quality assistant for product dimensions, packaging, substitutions, and carrier constraints", "category": "possible", "linkedIssueIds": ["card_008"], "createdAt": "2026-05-19T11:30:00.000Z", "updatedAt": "2026-05-19T11:30:00.000Z" },
+        { "id": "opp_007", "text": "AI logistics control tower combining demand, inventory, transport risk, and customer impact", "category": "strategic option", "linkedIssueIds": ["card_012"], "createdAt": "2026-05-19T11:35:00.000Z", "updatedAt": "2026-05-19T11:55:00.000Z" },
+        { "id": "opp_008", "text": "Supplier lead-time early-warning model for critical product families", "category": "possible", "linkedIssueIds": ["card_009"], "createdAt": "2026-05-19T11:38:00.000Z", "updatedAt": "2026-05-19T11:38:00.000Z" }
+      ]
+    },
+    "phase3": {
+      "useCases": [
+        {
+          "id": "uc_001",
+          "name": "AI demand forecasting for high-volume SKUs and regional hubs",
+          "opportunityId": "opp_001",
+          "problemOpportunity": "",
+          "proposedSolution": "Role (Who): As a demand planner responsible for regional hub replenishment\nGoal (What): I want AI-generated demand forecasts with drivers, confidence levels, and exception alerts\nBenefit (Why): so that I can reduce stockouts and overstock while spending less time on manual forecast adjustments.",
+          "targetUsers": "Demand planners, inventory managers, regional hub managers",
+          "expectedValue": "Improved forecast accuracy, lower inventory buffers, fewer urgent replenishment actions",
+          "processImpact": "Planning shifts from spreadsheet adjustment to exception review and approval",
+          "dataNeeds": "Historical orders, promotions, seasonality, stock levels, supplier lead times, regional demand patterns",
+          "risks": "Poor forecasts may create availability issues; planners need explanation and override capability",
+          "dependencies": "ERP/WMS data pipeline, product hierarchy cleanup, planner review workflow",
+          "owner": "Head of Supply Chain Planning",
+          "governance": "Human approval required before replenishment parameter changes",
+          "modelType": "Time-series forecasting with explainability layer",
+          "integrationNeeds": "ERP demand planning screen and replenishment workflow",
+          "compliance": "Use internal operational data only; maintain forecast and override audit trail",
+          "kpis": "Forecast accuracy, stockout rate, inventory turns, planner hours saved",
+          "effortEstimate": "Medium",
+          "createdAt": "2026-05-19T13:10:00.000Z",
+          "updatedAt": "2026-05-19T14:20:00.000Z"
+        },
+        {
+          "id": "uc_002",
+          "name": "Delivery exception triage assistant for late, damaged, or blocked shipments",
+          "opportunityId": "opp_003",
+          "problemOpportunity": "",
+          "proposedSolution": "Role (Who): As a transport coordinator monitoring nationwide deliveries\nGoal (What): I want AI to classify delivery exceptions, identify customer impact, and suggest next best actions\nBenefit (Why): so that I can resolve critical issues faster and prioritize shipments that affect important customers.",
+          "targetUsers": "Transport coordinators, customer service agents, regional logistics managers",
+          "expectedValue": "Faster exception resolution, fewer missed SLAs, better customer communication",
+          "processImpact": "Manual inbox and portal checks become a prioritized exception queue with suggested actions",
+          "dataNeeds": "TMS events, carrier updates, order priority, customer SLA, delivery history, contact templates",
+          "risks": "Wrong prioritization or customer message could harm service experience",
+          "dependencies": "Carrier event feed, TMS integration, customer SLA mapping",
+          "owner": "Logistics Operations Manager",
+          "governance": "AI suggests actions; coordinator approves customer-facing communication",
+          "modelType": "Classification, retrieval, and generative message drafting",
+          "integrationNeeds": "TMS exception queue and customer service case system",
+          "compliance": "Customer data and contract SLA terms must remain in approved systems",
+          "kpis": "Exception cycle time, SLA breach rate, proactive notifications, manual touches per exception",
+          "effortEstimate": "Medium",
+          "createdAt": "2026-05-19T13:30:00.000Z",
+          "updatedAt": "2026-05-19T14:35:00.000Z"
+        },
+        {
+          "id": "uc_003",
+          "name": "Customer service order-status assistant with source links across ERP, WMS, TMS, and carrier portals",
+          "opportunityId": "opp_004",
+          "problemOpportunity": "",
+          "proposedSolution": "Role (Who): As a customer service agent supporting B2B customers\nGoal (What): I want a single AI assistant that summarizes order, stock, shipment, and carrier status with source links\nBenefit (Why): so that I can answer customers faster and reduce handoffs to logistics and warehouse teams.",
+          "targetUsers": "Customer service agents, key account support teams",
+          "expectedValue": "Reduced average handling time, better first-contact resolution, improved customer satisfaction",
+          "processImpact": "Agents move from searching several systems to validating an AI-generated answer with sources",
+          "dataNeeds": "ERP order data, WMS pick/pack status, TMS shipment status, carrier tracking, customer notes",
+          "risks": "Assistant may expose restricted customer or pricing information if access control is weak",
+          "dependencies": "Identity/access model, system connectors, approved answer templates",
+          "owner": "Customer Service Director",
+          "governance": "Source-linked answers; no autonomous customer commitment without human review",
+          "modelType": "Retrieval-augmented generation",
+          "integrationNeeds": "CRM/customer service console and links to operational systems",
+          "compliance": "Respect customer-specific access rights and contract confidentiality",
+          "kpis": "Average handling time, first-contact resolution, escalation rate, CSAT",
+          "effortEstimate": "Medium",
+          "createdAt": "2026-05-19T13:50:00.000Z",
+          "updatedAt": "2026-05-19T14:45:00.000Z"
+        }
+      ]
+    },
+    "phase4": {
+      "scores": {
+        "uc_001": { "businessValue": 5, "feasibility": 3 },
+        "uc_002": { "businessValue": 4, "feasibility": 4 },
+        "uc_003": { "businessValue": 5, "feasibility": 4 }
+      }
+    },
+    "phase5": {
+      "roadmapItems": [
+        { "useCaseId": "uc_003", "placement": "Now", "status": "Planned", "owner": "Customer Service Director", "dependencies": "Identity/access model and CRM integration", "investmentTheme": "Customer experience and service productivity" },
+        { "useCaseId": "uc_002", "placement": "Now", "status": "Candidate", "owner": "Logistics Operations Manager", "dependencies": "Carrier event feed and TMS exception queue", "investmentTheme": "Delivery reliability" },
+        { "useCaseId": "uc_001", "placement": "Next", "status": "Candidate", "owner": "Head of Supply Chain Planning", "dependencies": "Planning data pipeline and product hierarchy cleanup", "investmentTheme": "Inventory optimization" }
+      ]
+    }
+  }
+}
