@@ -1,0 +1,6 @@
+backend/
+tests/
+demo-data/
+*.md
+.mcp.json
+skills-lock.json

@@ -305,3 +305,29 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .bcg-items { display: grid; gap: 0.45rem; }
 .bcg-item { padding: 0.55rem 0.65rem; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.8); }
 @media (max-width: 700px) { .bcg-matrix { grid-template-columns: 1fr; } .score-card-header { flex-direction: column; } }
+
+/* Auth pages */
+.auth-shell { min-height: 100vh; display: grid; place-items: center; background: var(--bg); padding: 1.5rem; }
+.auth-card { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 2rem; width: 100%; max-width: 420px; box-shadow: var(--shadow); }
+.auth-card h1 { margin: 0 0 0.25rem; font-size: 1.5rem; }
+.auth-card .subtitle { margin: 0 0 1.5rem; color: var(--muted); }
+.auth-card .field { margin-bottom: 1rem; }
+.auth-card .primary { width: 100%; margin-top: 0.5rem; padding: 0.75rem; }
+.auth-error { color: var(--danger); font-size: 0.9rem; margin-top: 0.5rem; }
+.auth-link { margin-top: 1.25rem; text-align: center; color: var(--muted); font-size: 0.9rem; }
+.auth-link a { color: var(--brand); }
+.auth-notice { margin-top: 1rem; padding: 1rem; border-radius: 14px; background: rgba(65, 240, 170, 0.18); border: 1px solid var(--line); }
+
+/* Projects page */
+.projects-shell { min-height: 100vh; display: grid; grid-template-rows: auto 1fr; background: var(--bg); }
+.projects-topbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #fff; border-bottom: 1px solid var(--line); }
+.projects-main { padding: 1.5rem; max-width: 1100px; margin: 0 auto; width: 100%; }
+.projects-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+.projects-header h2 { margin: 0; font-size: 1.4rem; }
+.project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+.project-card { display: grid; gap: 0.75rem; padding: 1.25rem; background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); }
+.project-card h3 { margin: 0; font-size: 1.05rem; }
+.project-card .meta { color: var(--muted); font-size: 0.88rem; margin: 0; }
+.project-card .card-actions { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.25rem; }
+.role-pill { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 999px; background: rgba(0,135,81,0.12); color: var(--brand); font-size: 0.78rem; font-weight: 700; }
+.empty-state { padding: 3rem; text-align: center; color: var(--muted); border: 2px dashed var(--line); border-radius: 18px; }

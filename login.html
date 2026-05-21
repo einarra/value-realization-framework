@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign in — AI Value Realization Framework</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <p class="eyebrow">AI Value Realization Framework</p>
+      <h1>Sign in</h1>
+      <p class="subtitle">Enter your email and password to continue.</p>
+      <form id="loginForm">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" required />
+        </div>
+        <div id="authError" class="auth-error" hidden></div>
+        <button id="submitBtn" class="primary" type="submit">Sign in</button>
+      </form>
+      <p class="auth-link">Don't have an account? <a href="register.html">Create one</a></p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script type="module">
+    import { signIn } from './js/auth.js';
+
+    const form = document.querySelector('#loginForm');
+    const emailInput = document.querySelector('#email');
+    const passwordInput = document.querySelector('#password');
+    const authError = document.querySelector('#authError');
+    const submitBtn = document.querySelector('#submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      authError.hidden = true;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Signing in…';
+
+      try {
+        await signIn(emailInput.value.trim(), passwordInput.value);
+        const next = new URLSearchParams(window.location.search).get('next');
+        window.location.href = next || 'projects.html';
+      } catch (err) {
+        authError.textContent = err.message;
+        authError.hidden = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign in';
+      }
+    });
+  </script>
+</body>
+</html>

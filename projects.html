@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projects — AI Value Realization Framework</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="projects-shell">
+    <header class="projects-topbar">
+      <div>
+        <p class="eyebrow">AI Value Realization Framework</p>
+        <h1>Your Projects</h1>
+      </div>
+      <div class="toolbar">
+        <span id="userEmail" class="save-status"></span>
+        <button id="signOutBtn" type="button">Sign out</button>
+      </div>
+    </header>
+
+    <main class="projects-main">
+      <div class="projects-header">
+        <h2>Projects</h2>
+        <button id="newProjectBtn" class="primary" type="button">New project</button>
+      </div>
+      <div id="projectGrid">
+        <p class="save-status">Loading…</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script type="module">
+    import { getSession, signOut } from './js/auth.js';
+    import { API_BASE_URL } from './js/config.js';
+
+    const projectGrid = document.querySelector('#projectGrid');
+    const userEmailEl = document.querySelector('#userEmail');
+    const signOutBtn = document.querySelector('#signOutBtn');
+    const newProjectBtn = document.querySelector('#newProjectBtn');
+
+    function formatDate(iso) {
+      return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function renderProjects(projects) {
+      if (!projects.length) {
+        projectGrid.innerHTML = '<div class="empty-state">No projects yet. Create one to get started.</div>';
+        return;
+      }
+
+      const grid = document.createElement('div');
+      grid.className = 'project-grid';
+
+      projects.forEach((p) => {
+        const card = document.createElement('div');
+        card.className = 'project-card';
+        card.innerHTML = `
+          <h3>${escapeHtml(p.name)}</h3>
+          <span class="role-pill">${escapeHtml(p.role || 'owner')}</span>
+          <p class="meta">Updated ${formatDate(p.updated_at)}</p>
+          <div class="card-actions">
+            <button class="primary open-btn" type="button" data-id="${p.id}">Open</button>
+          </div>
+        `;
+        card.querySelector('.open-btn').addEventListener('click', () => {
+          window.location.href = 'index.html?project=' + p.id;
+        });
+        grid.appendChild(card);
+      });
+
+      projectGrid.replaceChildren(grid);
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    async function loadProjects(token) {
+      const res = await fetch(`${API_BASE_URL}/api/v1/projects`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error(`Failed to load projects (${res.status})`);
+      return res.json();
+    }
+
+    async function createProject(name, token) {
+      const res = await fetch(`${API_BASE_URL}/api/v1/projects`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name })
+      });
+      if (!res.ok) throw new Error(`Failed to create project (${res.status})`);
+      return res.json();
+    }
+
+    async function init() {
+      const session = await getSession();
+      if (!session) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      userEmailEl.textContent = session.user.email;
+
+      signOutBtn.addEventListener('click', async () => {
+        await signOut();
+        window.location.href = 'login.html';
+      });
+
+      newProjectBtn.addEventListener('click', async () => {
+        const name = prompt('Project name:');
+        if (!name) return;
+        try {
+          const project = await createProject(name.trim(), session.access_token);
+          window.location.href = 'index.html?project=' + project.id;
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+
+      try {
+        const projects = await loadProjects(session.access_token);
+        renderProjects(projects);
+      } catch (err) {
+        projectGrid.innerHTML = `<p class="auth-error">${escapeHtml(err.message)}</p>`;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

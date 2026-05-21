@@ -10,10 +10,13 @@
   <div class="app-shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Local facilitator workspace</p>
+        <p class="eyebrow">AI Value Realization Framework</p>
         <h1>AI Value Realization Framework</h1>
       </div>
       <div class="toolbar">
+        <button id="projectsBtn" type="button">Projects</button>
+        <button id="settingsBtn" type="button">Settings</button>
+        <button id="signOutBtn" type="button">Sign out</button>
         <span id="saveStatus" class="save-status">Not saved yet</span>
         <button id="exportPhaseBtn" type="button">Export current phase</button>
         <button id="exportWorkspaceBtn" type="button">Export workspace</button>
@@ -30,6 +33,7 @@
     <main id="phaseRoot" class="phase-root" tabindex="-1"></main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script type="module" src="js/app.js?v=20260519-phase4-neutral-cards"></script>
 </body>
 </html>

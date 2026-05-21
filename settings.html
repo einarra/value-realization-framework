@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project settings — AI Value Realization Framework</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .settings-main { padding: 1.5rem; max-width: 720px; margin: 0 auto; }
+    .settings-section { margin-bottom: 2rem; }
+    .settings-section h2 { margin: 0 0 1rem; font-size: 1.1rem; }
+    .member-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 0; border-bottom: 1px solid var(--line);
+    }
+    .member-row:last-child { border-bottom: 0; }
+    .member-email { flex: 1; font-size: 0.95rem; }
+    .member-status { color: var(--muted); font-size: 0.82rem; }
+    .invite-form { display: grid; grid-template-columns: 1fr auto auto; gap: 0.5rem; align-items: end; }
+    @media (max-width: 560px) { .invite-form { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="projects-shell">
+    <header class="projects-topbar">
+      <div>
+        <p class="eyebrow">AI Value Realization Framework</p>
+        <h1 id="projectTitle">Project settings</h1>
+      </div>
+      <div class="toolbar">
+        <button id="backBtn" type="button">← Back to project</button>
+      </div>
+    </header>
+
+    <main class="settings-main">
+
+      <!-- Project name -->
+      <section class="settings-section panel">
+        <h2>Project name</h2>
+        <div class="invite-form">
+          <div class="field" style="margin:0">
+            <label for="projectName">Name</label>
+            <input id="projectName" type="text" maxlength="255" />
+          </div>
+          <button id="saveNameBtn" class="primary" type="button" style="align-self:flex-end">Save</button>
+        </div>
+        <p id="nameStatus" class="save-status" style="margin-top:0.5rem"></p>
+      </section>
+
+      <!-- Members -->
+      <section class="settings-section panel">
+        <h2>Members</h2>
+        <div id="memberList"><p class="save-status">Loading…</p></div>
+      </section>
+
+      <!-- Invite -->
+      <section class="settings-section panel" id="inviteSection">
+        <h2>Invite collaborator</h2>
+        <div class="invite-form">
+          <div class="field" style="margin:0">
+            <label for="inviteEmail">Email address</label>
+            <input id="inviteEmail" type="email" placeholder="colleague@example.com" />
+          </div>
+          <div class="field" style="margin:0">
+            <label for="inviteRole">Role</label>
+            <select id="inviteRole">
+              <option value="editor">Editor</option>
+              <option value="viewer">Viewer</option>
+            </select>
+          </div>
+          <button id="inviteBtn" class="primary" type="button" style="align-self:flex-end">Send invite</button>
+        </div>
+        <p id="inviteStatus" class="save-status" style="margin-top:0.5rem"></p>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script type="module">
+    import { getSession } from './js/auth.js';
+    import { API_BASE_URL } from './js/config.js';
+
+    const projectId = new URLSearchParams(window.location.search).get('project');
+
+    const projectTitle  = document.querySelector('#projectTitle');
+    const backBtn       = document.querySelector('#backBtn');
+    const projectNameEl = document.querySelector('#projectName');
+    const saveNameBtn   = document.querySelector('#saveNameBtn');
+    const nameStatus    = document.querySelector('#nameStatus');
+    const memberList    = document.querySelector('#memberList');
+    const inviteSection = document.querySelector('#inviteSection');
+    const inviteEmail   = document.querySelector('#inviteEmail');
+    const inviteRole    = document.querySelector('#inviteRole');
+    const inviteBtn     = document.querySelector('#inviteBtn');
+    const inviteStatus  = document.querySelector('#inviteStatus');
+
+    let session = null;
+    let callerRole = null;
+
+    function authHeaders() {
+      return { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    async function loadMembers() {
+      const res = await fetch(`${API_BASE_URL}/api/v1/projects/${projectId}/members`, {
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      });
+      const members = await res.json();
+
+      // Find caller's role
+      callerRole = members.find(m => m.user_id === session.user.id)?.role;
+
+      // Hide invite section for viewers
+      if (callerRole === 'viewer') inviteSection.hidden = true;
+
+      if (!members.length) {
+        memberList.innerHTML = '<p class="muted-empty">No members yet.</p>';
+        return;
+      }
+
+      const rows = members.map(m => {
+        const isAccepted = !!m.accepted_at;
+        const isSelf = m.user_id === session.user.id;
+        const canRemove = callerRole === 'owner' || isSelf;
+
+        return `
+          <div class="member-row">
+            <div class="member-email">
+              ${escapeHtml(m.invited_email)}
+              ${isSelf ? '<span class="member-status">(you)</span>' : ''}
+            </div>
+            <span class="role-pill">${escapeHtml(m.role)}</span>
+            <span class="member-status">${isAccepted ? 'Active' : 'Pending'}</span>
+            ${callerRole === 'owner' && isAccepted && !isSelf ? `
+              <select class="role-select" data-id="${m.id}" style="padding:0.3rem 0.5rem;border-radius:8px;border:1px solid var(--line);font-size:0.85rem">
+                <option value="editor" ${m.role === 'editor' ? 'selected' : ''}>Editor</option>
+                <option value="viewer" ${m.role === 'viewer' ? 'selected' : ''}>Viewer</option>
+              </select>` : ''}
+            ${canRemove && !isSelf ? `<button class="remove-btn danger" data-id="${m.id}" style="padding:0.35rem 0.6rem;font-size:0.82rem">Remove</button>` : ''}
+          </div>`;
+      }).join('');
+
+      memberList.innerHTML = rows;
+
+      // Wire role selects
+      memberList.querySelectorAll('.role-select').forEach(sel => {
+        sel.addEventListener('change', async () => {
+          const res = await fetch(`${API_BASE_URL}/api/v1/projects/${projectId}/members/${sel.dataset.id}`, {
+            method: 'PATCH',
+            headers: authHeaders(),
+            body: JSON.stringify({ role: sel.value }),
+          });
+          if (!res.ok) { alert('Failed to change role'); sel.value = sel.value === 'editor' ? 'viewer' : 'editor'; }
+        });
+      });
+
+      // Wire remove buttons
+      memberList.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Remove this member from the project?')) return;
+          const res = await fetch(`${API_BASE_URL}/api/v1/projects/${projectId}/members/${btn.dataset.id}`, {
+            method: 'DELETE', headers: { Authorization: `Bearer ${session.access_token}` }
+          });
+          if (res.ok) loadMembers();
+          else alert('Failed to remove member');
+        });
+      });
+    }
+
+    async function init() {
+      if (!projectId) { window.location.href = 'projects.html'; return; }
+
+      session = await getSession();
+      if (!session) { window.location.href = 'login.html'; return; }
+
+      backBtn.addEventListener('click', () => { window.location.href = `index.html?project=${projectId}`; });
+
+      // Load project details
+      const res = await fetch(`${API_BASE_URL}/api/v1/projects/${projectId}`, {
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      });
+      if (!res.ok) { window.location.href = 'projects.html'; return; }
+      const project = await res.json();
+      projectTitle.textContent = project.name;
+      projectNameEl.value = project.name;
+
+      await loadMembers();
+
+      // Save name
+      saveNameBtn.addEventListener('click', async () => {
+        const name = projectNameEl.value.trim();
+        if (!name) return;
+        saveNameBtn.disabled = true;
+        const r = await fetch(`${API_BASE_URL}/api/v1/projects/${projectId}`, {
+          method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ name }),
+        });
+        saveNameBtn.disabled = false;
+        if (r.ok) {
+          projectTitle.textContent = name;
+          nameStatus.textContent = 'Saved';
+          setTimeout(() => { nameStatus.textContent = ''; }, 2000);
+        } else {
+          nameStatus.textContent = 'Failed to save';
+        }
+      });
+
+      // Send invite
+      inviteBtn.addEventListener('click', async () => {
+        const email = inviteEmail.value.trim();
+        if (!email) return;
+        inviteBtn.disabled = true;
+        inviteBtn.textContent = 'Sending…';
+        inviteStatus.textContent = '';
+        const r = await fetch(`${API_BASE_URL}/api/v1/projects/${projectId}/invite`, {
+          method: 'POST', headers: authHeaders(),
+          body: JSON.stringify({ email, role: inviteRole.value }),
+        });
+        inviteBtn.disabled = false;
+        inviteBtn.textContent = 'Send invite';
+        if (r.ok) {
+          const data = await r.json();
+          inviteEmail.value = '';
+          inviteStatus.textContent = `Invitation sent to ${email}`;
+          // Show link in dev (when email isn't configured)
+          if (data.invitation_url) {
+            inviteStatus.textContent += ' — copy link: ' + data.invitation_url;
+          }
+          loadMembers();
+        } else {
+          const data = await r.json().catch(() => ({}));
+          inviteStatus.textContent = data.detail || 'Failed to send invitation';
+        }
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

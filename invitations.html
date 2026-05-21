@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Accept invitation — AI Value Realization Framework</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <p class="eyebrow">AI Value Realization Framework</p>
+      <h1>Project invitation</h1>
+
+      <div id="stateLoading">
+        <p class="subtitle">Verifying your invitation…</p>
+      </div>
+
+      <div id="stateAccept" hidden>
+        <p class="subtitle">You've been invited to collaborate on a project. Sign in to accept.</p>
+        <button id="acceptBtn" class="primary" type="button">Accept invitation</button>
+        <p id="acceptError" class="auth-error" hidden></p>
+      </div>
+
+      <div id="stateSuccess" class="auth-notice" hidden>
+        Invitation accepted! Redirecting to your project…
+      </div>
+
+      <div id="stateError" hidden>
+        <p id="errorMsg" class="auth-error"></p>
+        <p class="auth-link"><a href="projects.html">Go to projects</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script type="module">
+    import { getSession } from './js/auth.js';
+    import { API_BASE_URL } from './js/config.js';
+
+    const token = new URLSearchParams(window.location.search).get('token');
+
+    const stateLoading = document.querySelector('#stateLoading');
+    const stateAccept  = document.querySelector('#stateAccept');
+    const stateSuccess = document.querySelector('#stateSuccess');
+    const stateError   = document.querySelector('#stateError');
+    const acceptBtn    = document.querySelector('#acceptBtn');
+    const acceptError  = document.querySelector('#acceptError');
+    const errorMsg     = document.querySelector('#errorMsg');
+
+    function showError(msg) {
+      stateLoading.hidden = true;
+      stateAccept.hidden  = true;
+      stateError.hidden   = false;
+      errorMsg.textContent = msg;
+    }
+
+    async function acceptInvitation(token, accessToken) {
+      const res = await fetch(`${API_BASE_URL}/invitations/accept`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ token }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || `Request failed (${res.status})`);
+      }
+      return res.json();
+    }
+
+    async function init() {
+      if (!token) {
+        showError('No invitation token found in the URL.');
+        return;
+      }
+
+      const session = await getSession();
+
+      if (!session) {
+        // Not logged in — send to login and come back here after.
+        const next = encodeURIComponent(window.location.href);
+        window.location.href = `login.html?next=${next}`;
+        return;
+      }
+
+      // Logged in — try to accept immediately.
+      stateLoading.hidden = true;
+      stateAccept.hidden  = false;
+
+      acceptBtn.addEventListener('click', async () => {
+        acceptBtn.disabled = true;
+        acceptBtn.textContent = 'Accepting…';
+        acceptError.hidden = true;
+        try {
+          const result = await acceptInvitation(token, session.access_token);
+          stateAccept.hidden  = true;
+          stateSuccess.hidden = false;
+          setTimeout(() => {
+            window.location.href = `index.html?project=${result.project_id}`;
+          }, 1500);
+        } catch (err) {
+          acceptError.textContent = err.message;
+          acceptError.hidden = false;
+          acceptBtn.disabled = false;
+          acceptBtn.textContent = 'Accept invitation';
+        }
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create account — AI Value Realization Framework</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <p class="eyebrow">AI Value Realization Framework</p>
+      <h1>Create account</h1>
+      <p class="subtitle">Enter your details to get started.</p>
+      <form id="registerForm">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" required />
+        </div>
+        <div id="authError" class="auth-error" hidden></div>
+        <button id="submitBtn" class="primary" type="submit">Create account</button>
+      </form>
+      <div id="successNotice" class="auth-notice" hidden>
+        Account created! Check your email to confirm your address, then sign in.
+      </div>
+      <p class="auth-link">Already have an account? <a href="login.html">Sign in</a></p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script type="module">
+    import { signUp } from './js/auth.js';
+
+    const form = document.querySelector('#registerForm');
+    const emailInput = document.querySelector('#email');
+    const passwordInput = document.querySelector('#password');
+    const authError = document.querySelector('#authError');
+    const submitBtn = document.querySelector('#submitBtn');
+    const successNotice = document.querySelector('#successNotice');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      authError.hidden = true;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account…';
+
+      try {
+        await signUp(emailInput.value.trim(), passwordInput.value);
+        form.hidden = true;
+        successNotice.hidden = false;
+      } catch (err) {
+        authError.textContent = err.message;
+        authError.hidden = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create account';
+      }
+    });
+  </script>
+</body>
+</html>
