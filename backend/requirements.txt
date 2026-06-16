@@ -3,7 +3,6 @@ uvicorn[standard]
 supabase
 python-jose[cryptography]
 httpx
-resend
 python-dotenv
 pydantic-settings
 pydantic[email]

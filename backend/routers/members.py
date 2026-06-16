@@ -120,15 +120,6 @@ def invite_member(
     if existing and existing.data:
         return existing.data
 
-    # Fetch project name for the email.
-    project_result = (
-        db.table("projects").select("name").eq("id", project_id).single().execute()
-    )
-    project_name = project_result.data["name"]
-
-    # Inviter email comes from the verified JWT payload.
-    inviter_email = user.get("email", "A colleague")
-
     # Generate signed invitation token and expiry.
     token = _make_invitation_token(project_id, email)
     expires_at = (
@@ -152,7 +143,7 @@ def invite_member(
     row = result.data[0]
 
     invitation_url = f"{settings.frontend_url}/invitations.html?token={token}"
-    send_invitation_email(email, project_name, invitation_url, inviter_email)
+    send_invitation_email(db, email, invitation_url)
 
     # Include the invitation URL in the response (useful when email isn't configured).
     return {**row, "invitation_url": invitation_url}
