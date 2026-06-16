@@ -24,4 +24,4 @@ def send_invitation_email(
         # Email delivery failures (rate limits, user already exists, redirect URL
         # not whitelisted, etc.) must not abort the invitation — the row is already
         # saved and the caller receives the invitation_url they can share manually.
-        print(f"[EMAIL] Could not send invite to {to_email}: {exc}")
+        print(f"[EMAIL] Could not send invite to {to_email}: {type(exc).__name__}: {exc!r}")
