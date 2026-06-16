@@ -226,10 +226,6 @@
           const data = await r.json();
           inviteEmail.value = '';
           inviteStatus.textContent = `Invitation sent to ${email}`;
-          // Show link in dev (when email isn't configured)
-          if (data.invitation_url) {
-            inviteStatus.textContent += ' — copy link: ' + data.invitation_url;
-          }
           loadMembers();
         } else {
           const data = await r.json().catch(() => ({}));
