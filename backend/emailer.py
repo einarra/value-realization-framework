@@ -21,9 +21,7 @@ def send_invitation_email(
             options={"redirect_to": invitation_url},
         )
     except Exception as exc:
-        # "User already registered" is fine — they can use the link directly.
-        msg = str(exc).lower()
-        if "already" in msg or "exists" in msg:
-            print(f"[EMAIL] {to_email} already registered in Supabase; skipping invite email.")
-        else:
-            raise
+        # Email delivery failures (rate limits, user already exists, redirect URL
+        # not whitelisted, etc.) must not abort the invitation — the row is already
+        # saved and the caller receives the invitation_url they can share manually.
+        print(f"[EMAIL] Could not send invite to {to_email}: {exc}")
