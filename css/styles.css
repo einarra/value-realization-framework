@@ -314,6 +314,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .auth-card .field { margin-bottom: 1rem; }
 .auth-card .primary { width: 100%; margin-top: 0.5rem; padding: 0.75rem; }
 .auth-error { color: var(--danger); font-size: 0.9rem; margin-top: 0.5rem; }
+.auth-success { color: var(--brand); font-size: 0.9rem; margin-top: 0.5rem; }
 .auth-link { margin-top: 1.25rem; text-align: center; color: var(--muted); font-size: 0.9rem; }
 .auth-link a { color: var(--brand); }
 .auth-notice { margin-top: 1rem; padding: 1rem; border-radius: 14px; background: rgba(65, 240, 170, 0.18); border: 1px solid var(--line); }

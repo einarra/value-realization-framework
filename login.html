@@ -10,49 +10,162 @@
   <div class="auth-shell">
     <div class="auth-card">
       <p class="eyebrow">AI Value Realization Framework</p>
-      <h1>Sign in</h1>
-      <p class="subtitle">Enter your email and password to continue.</p>
-      <form id="loginForm">
-        <div class="field">
-          <label for="email">Email</label>
-          <input id="email" type="email" autocomplete="email" required />
-        </div>
-        <div class="field">
-          <label for="password">Password</label>
-          <input id="password" type="password" autocomplete="current-password" required />
-        </div>
-        <div id="authError" class="auth-error" hidden></div>
-        <button id="submitBtn" class="primary" type="submit">Sign in</button>
-      </form>
-      <p class="auth-link">Don't have an account? <a href="register.html">Create one</a></p>
+
+      <!-- View 1: Sign in -->
+      <div id="view-signin">
+        <h1>Sign in</h1>
+        <p class="subtitle">Enter your email and password to continue.</p>
+        <form id="loginForm">
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" autocomplete="email" required />
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password" required />
+          </div>
+          <div id="loginError" class="auth-error" hidden></div>
+          <button id="loginBtn" class="primary" type="submit">Sign in</button>
+        </form>
+        <p class="auth-link"><a href="#" id="forgotLink">Forgot password?</a></p>
+        <p class="auth-link">Don't have an account? <a href="register.html">Create one</a></p>
+      </div>
+
+      <!-- View 2: Forgot password -->
+      <div id="view-forgot" hidden>
+        <h1>Reset password</h1>
+        <p class="subtitle">Enter your email and we'll send you a reset link.</p>
+        <form id="forgotForm">
+          <div class="field">
+            <label for="resetEmail">Email</label>
+            <input id="resetEmail" type="email" autocomplete="email" required />
+          </div>
+          <div id="forgotError" class="auth-error" hidden></div>
+          <div id="forgotSuccess" class="auth-success" hidden></div>
+          <button id="forgotBtn" class="primary" type="submit">Send reset link</button>
+        </form>
+        <p class="auth-link"><a href="#" id="backToSignin">Back to sign in</a></p>
+      </div>
+
+      <!-- View 3: Set new password (after clicking reset link in email) -->
+      <div id="view-set-password" hidden>
+        <h1>Set new password</h1>
+        <p class="subtitle">Choose a password for your account.</p>
+        <form id="setPasswordForm">
+          <div class="field">
+            <label for="newPassword">New password</label>
+            <input id="newPassword" type="password" autocomplete="new-password" required minlength="8" />
+          </div>
+          <div class="field">
+            <label for="confirmPassword">Confirm password</label>
+            <input id="confirmPassword" type="password" autocomplete="new-password" required minlength="8" />
+          </div>
+          <div id="setPasswordError" class="auth-error" hidden></div>
+          <button id="setPasswordBtn" class="primary" type="submit">Set password</button>
+        </form>
+      </div>
+
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script type="module">
-    import { signIn } from './js/auth.js';
+    import { signIn, resetPasswordForEmail, updatePassword, supabase } from './js/auth.js';
 
-    const form = document.querySelector('#loginForm');
-    const emailInput = document.querySelector('#email');
-    const passwordInput = document.querySelector('#password');
-    const authError = document.querySelector('#authError');
-    const submitBtn = document.querySelector('#submitBtn');
+    const views = {
+      signin: document.querySelector('#view-signin'),
+      forgot: document.querySelector('#view-forgot'),
+      setPassword: document.querySelector('#view-set-password'),
+    };
 
-    form.addEventListener('submit', async (e) => {
+    function showView(name) {
+      Object.entries(views).forEach(([key, el]) => el.hidden = key !== name);
+    }
+
+    // Detect recovery session (user clicked reset link in email).
+    supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') showView('setPassword');
+    });
+
+    // Sign-in form
+    document.querySelector('#loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      authError.hidden = true;
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Signing in…';
-
+      const btn = document.querySelector('#loginBtn');
+      const err = document.querySelector('#loginError');
+      err.hidden = true;
+      btn.disabled = true;
+      btn.textContent = 'Signing in…';
       try {
-        await signIn(emailInput.value.trim(), passwordInput.value);
+        await signIn(
+          document.querySelector('#email').value.trim(),
+          document.querySelector('#password').value,
+        );
         const next = new URLSearchParams(window.location.search).get('next');
         window.location.href = next || 'projects.html';
-      } catch (err) {
-        authError.textContent = err.message;
-        authError.hidden = false;
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Sign in';
+      } catch (ex) {
+        err.textContent = ex.message;
+        err.hidden = false;
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+      }
+    });
+
+    // Forgot-password link
+    document.querySelector('#forgotLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showView('forgot');
+    });
+    document.querySelector('#backToSignin').addEventListener('click', (e) => {
+      e.preventDefault();
+      showView('signin');
+    });
+
+    // Forgot-password form
+    document.querySelector('#forgotForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.querySelector('#forgotBtn');
+      const err = document.querySelector('#forgotError');
+      const success = document.querySelector('#forgotSuccess');
+      err.hidden = true;
+      success.hidden = true;
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      try {
+        await resetPasswordForEmail(document.querySelector('#resetEmail').value.trim());
+        success.textContent = 'Check your email for the reset link.';
+        success.hidden = false;
+      } catch (ex) {
+        err.textContent = ex.message;
+        err.hidden = false;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Send reset link';
+      }
+    });
+
+    // Set-new-password form
+    document.querySelector('#setPasswordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.querySelector('#setPasswordBtn');
+      const err = document.querySelector('#setPasswordError');
+      const newPw = document.querySelector('#newPassword').value;
+      const confirmPw = document.querySelector('#confirmPassword').value;
+      err.hidden = true;
+      if (newPw !== confirmPw) {
+        err.textContent = 'Passwords do not match.';
+        err.hidden = false;
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+      try {
+        await updatePassword(newPw);
+        window.location.href = 'projects.html';
+      } catch (ex) {
+        err.textContent = ex.message;
+        err.hidden = false;
+        btn.disabled = false;
+        btn.textContent = 'Set password';
       }
     });
   </script>

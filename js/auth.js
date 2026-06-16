@@ -24,3 +24,14 @@ export async function signUp(email, password) {
 export async function signOut() {
   await supabase.auth.signOut();
 }
+
+export async function resetPasswordForEmail(email) {
+  const redirectTo = `${window.location.origin}/login.html`;
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) throw error;
+}
+
+export async function updatePassword(newPassword) {
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) throw error;
+}
